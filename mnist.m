@@ -1,4 +1,4 @@
-
+addpath(genpath('./nets/'));
 %% Set up MNIST
 data = loadMNISTImages('./mnist/train-images.idx3-ubyte');
 dim = 784;
@@ -10,7 +10,7 @@ problem.w0 = net.w;
 %% Standard algorithm run
 f0 = problem.funObj(problem.w0);
 methods{1}.name = 'adaQN';
-methods{1}.arg1 = 1e-4;
+methods{1}.arg1 = 1e-6;
 methods{1}.arg2 = 20;
 methods{1}.color = 'r';
 methods{2}.name = 'SGD';
@@ -38,7 +38,7 @@ for it=1:length(methods)
     options.tuning_steps = 5;
     options.damping = 1;
     options.regularization = 0;
-    options.H0 = 'BB';
+    options.H0 = 'ADAGRAD';
     tic;
     logger = minSQN(problem,options,[m.arg1, m.arg2]);
     toc;
@@ -51,5 +51,5 @@ end
 %% Post-processing
 xlabel('Epochs');
 ylabel('Average Function Value Per Epoch');
-legend([methods{1}.name, methods{2}.name],'Location','Best');
+legend(methods{1}.name, methods{2}.name,'Location','Best');
 print -djpeg -r300 all_minSQN_methods.jpeg
