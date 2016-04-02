@@ -10,7 +10,7 @@ problem.w0 = net.w;
 %% Standard algorithm run
 f0 = problem.funObj(problem.w0);
 methods{1}.name = 'adaQN';
-methods{1}.arg1 = 1e-6;
+methods{1}.arg1 = 1e-4;
 methods{1}.arg2 = 20;
 methods{1}.color = 'r';
 methods{2}.name = 'SGD';
