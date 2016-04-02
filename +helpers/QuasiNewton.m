@@ -75,7 +75,7 @@ classdef QuasiNewton < handle
             % multiple of the identity as in the Barzilai-Borwein strategy)
             % and less noisy. 
             
-            if(ismember(obj.initialization_method,{'BB','RMS'}))
+            if(ismember(obj.initialization_method,{'ADAGRAD','RMS'}))
                 obj.adagrad_sum = obj.adagrad_sum + g.^2;
                 obj.rms_sum = obj.rms_sum*0.9 + 0.1*g.^2;
             end

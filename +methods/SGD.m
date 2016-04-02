@@ -93,13 +93,18 @@ for tuning_step = 1:number_of_tuning_steps
                 
                 % compute a stochastic function value and add to running
                 % sum
-                avg_function_value = avg_function_value + problem.funObj(w,indices)/floor(problem.m/options.batch_size);
+                func_value =  problem.funObj(w,indices);
+                logger.fhist = [logger.fhist; func_value];
+                if(options.verbose>1)
+                    fprintf('Epoch: %d, Batch: %d, Loss: %f \n',epoch, batch, logger.fhist(end))
+                end
+                avg_function_value = avg_function_value + func_value/floor(problem.m/options.batch_size);
                 
                 % update the iterate
                 w = w - alpha * sg;
             end
             % append the current function value to the logger every epoch
-            logger.fhist = [logger.fhist; avg_function_value];
+            % logger.fhist = [logger.fhist; avg_function_value];
             % if verbose, then print the current function value every epoch
             if(options.verbose)
                 fprintf('Epoch: %d, Average Loss: %f \n',epoch,logger.fhist(end))

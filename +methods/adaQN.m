@@ -119,7 +119,12 @@ for tuning_step = 1:number_of_tuning_steps
                 
                 % compute a stochastic function value and add to running
                 % sum
-                avg_function_value = avg_function_value + problem.funObj(w,indices)/(floor(problem.m/options.batch_size)-options.batch_size_fun/options.batch_size);                
+                func_value =  problem.funObj(w,indices);
+                logger.fhist = [logger.fhist; func_value];
+                if(options.verbose>1)
+                    fprintf('Epoch: %d, Batch: %d, Loss: %f \n',epoch, batch, logger.fhist(end))
+                end
+                avg_function_value = avg_function_value + func_value/(floor(problem.m/options.batch_size)-options.batch_size_fun/options.batch_size);                
                 
                 % append the new stochastic gradient to the Fisher
                 % container
@@ -148,13 +153,16 @@ for tuning_step = 1:number_of_tuning_steps
                         % the old function value, reset curvature pairs
                         if(problem.funObj(w_n,indices_monitor_fun)>1.01*problem.funObj(w_o,indices_monitor_fun))
                             % reset S and Y
+                            fprintf('RESET \n');
                             qn.reset()
                             w = w_o;
                             continue;
                         end
                         % update the curvature pairs
                         s = w_n - w_o;
-                        y = fisher_container * fisher_container' * s;
+                        % You need brackets here so you don't run out of
+                        % memory
+                        y = fisher_container * (fisher_container' * s);
                         % if curvature estimate is less than sqrt of
                         % machine precision, SKIP the curvature pair update
                         rho = dot(s,y)/dot(y,y);
@@ -162,7 +170,7 @@ for tuning_step = 1:number_of_tuning_steps
                             qn.store(s,y);
                             w_o = w_n;
                         else
-                            %fprintf('SKIP \n');
+                            fprintf('SKIP \n');
                         end
                     else
                         % update the old averaged uterate
@@ -175,7 +183,7 @@ for tuning_step = 1:number_of_tuning_steps
                 k = k + 1;
             end
             % append the current function value to the logger every epoch
-            logger.fhist = [logger.fhist; avg_function_value];
+            % logger.fhist = [logger.fhist; avg_function_value];
             % if verbose, then print the current function value every epoch
             if(options.verbose)
                 fprintf('Epoch: %d, Average Loss: %f \n',epoch,logger.fhist(end))
